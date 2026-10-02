@@ -1,5 +1,6 @@
 #include <Wire.h>
-#include <LiquidCrystal_PCF8574.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 
 #define Piezo0 36
 #define Piezo1 39
@@ -61,14 +62,12 @@ String Escritura[TAM];
 
 char cmd[2];
 
-LiquidCrystal_PCF8574 lcd(0x27);
+Adafruit_SSD1306 oled(128, 64, &Wire, 4);
 
 void setup() {
 
     Wire.begin(SDA, SCL);
-
-    lcd.begin(168,64);
-    lcd.setBacklight(1);
+    oled.begin(SSD1306_SWITCHCAPVCC, 0x27);
 
     Serial.begin(115200);
 
@@ -79,7 +78,7 @@ void setup() {
 }
 
 void loop() {
-    //----------------------------------------------------- Protocolo DAM [NO TOCAR] --------------------------------------------------------//
+    //----------------------------------------------------- Protocolo DAM [TOCAR] --------------------------------------------------------//
 
     if (Serial.available()) {
         Serial.readBytes(cmd, 2);
@@ -151,13 +150,15 @@ void loop() {
         }
 
   if (selectedMenu){
-        lcd.setCursor(0, 0);
-        lcd.print("(1)Loop (2)Met ");
+      oled.setTextColor(WHITE);
+      oled.setTextSize(1);
 
-        lcd.setCursor(0, 1);
-        lcd.print("(3)Lib  (4)Game");
-
-  for(int i=0; i<7; i++){  
+      oled.setCursor(0, 0);
+      oled.print("(1)Loop (2)Met ");
+      oled.setCursor(0, 8);
+      oled.print("(3)Lib  (4)Game");
+      oled.display();
+    for(int i=0; i<7; i++){  
       if (PiezoVal[i]){
         switch (i) {
         case 0: 
@@ -223,9 +224,13 @@ else {
         switch (menu) {
             case 0: {
               if (enterMenu0) {
-                lcd.clear();
-                lcd.setCursor(0, 0);
-                lcd.print("Loop");
+                oled.setTextColor(WHITE);
+                oled.setTextSize(1);
+
+                oled.clearDisplay();
+                oled.setCursor(0, 0);
+                oled.print("Loop");
+                oled.display();
               enterMenu0 = false;
               }
               
@@ -234,28 +239,40 @@ else {
             break;
 
             case 1: {
-                if (enterMenu1) {
-                lcd.clear();
-                lcd.setCursor(0, 0);
-                lcd.print("Tempo (BPM)");
+              if (enterMenu1) {
+                oled.clearDisplay();
+                oled.setTextColor(WHITE);
+                oled.setTextSize(1);
+
+                oled.setCursor(0, 0);
+                oled.print("Tempo (BPM)");
+                oled.display();
                 enterMenu1 = false;
                 }
               //corregir esto
-                lcd.setCursor(0, 1);
+                oled.setTextColor(WHITE);
+                oled.setTextSize(2);
+
+                oled.setCursor(30, 16);
                 long int BPM = map(vol_BPM, 0, 4095, 0, 300);
               
-                lcd.print(BPM);
+                oled.print(BPM);
+                oled.display();
             }
             break;
 
             case 2: {
               if(enterMenu2) {
-                lcd.clear();
-                lcd.setCursor(0, 0);
-                lcd.print("Seleccione");
+                oled.clearDisplay();
+                oled.setTextColor(WHITE);
+                oled.setTextSize(1);
 
-                lcd.setCursor(0, 1);
-                lcd.print("una libreria");
+                oled.setCursor(0, 0);
+                oled.print("Seleccione");
+
+                oled.setCursor(0, 8);
+                oled.print("una libreria");
+                oled.display();
                 enterMenu2= false;
                 }
                 
@@ -272,53 +289,58 @@ else {
             break;
 
             case 3: {
-                if (replay) {
-                  if (enterMenu3) {
-                    lcd.clear();
+              if (replay) {
+                if (enterMenu3) {
+                  oled.clearDisplay();
+                  oled.setTextColor(WHITE);
+                  oled.setTextSize(1);
 
-                    lcd.setCursor(0, 0);
-                    lcd.print("Escucha la");
+                  oled.setCursor(0, 0);
+                  oled.print("Escucha la");
 
-                    lcd.setCursor(0, 1);
-                    lcd.print("secuencia!");
-                    enterMenu3 = false;
-                  }
-                    Lectura[11] = 1;
-
-                    timeSecuence = Escritura[2].toInt();
-
-                    start = millis();
-
-                    replay = false;
+                  oled.setCursor(0, 8);
+                  oled.print("secuencia!");
+                  oled.display();
+                  enterMenu3 = false;
                 }
+                  Lectura[11] = 1;
 
-                if (millis() - start < (unsigned long)(timeSecuence + 1000)) {
+                  timeSecuence = Escritura[2].toInt();
 
-                    Lectura[12] = '1';
-                } else {
-                    Lectura[12] = '0';
-                    lcd.clear();
-                    lcd.setCursor(0, 0);
-                    lcd.print("Tiempo terminado");
+                  start = millis();
 
-                    lcd.setCursor(0, 1);
-                    lcd.print("Punt:");
+                  replay = false;
+              }
 
-                    lcd.print(Lectura[13]);       
+              if (millis() - start < (unsigned long)(timeSecuence + 1000)) {
+                Lectura[12] = '1';
+              } else {
+                Lectura[12] = '0';
+                oled.clearDisplay();
+                oled.setTextColor(WHITE);
+                oled.setTextSize(1);
+    
+                oled.setCursor(0, 0);
+                oled.print("Tiempo terminado");
+
+                oled.setCursor(0, 8);
+                oled.print("Punt:");
+
+                oled.print(Lectura[13]);       
+                oled.display();
                   for (int i = 0; i < 7; i++) {
                     if (PiezoVal[i]) {
                       break;
                     }
                   }
-                }
-              }
-            default:
-            menu = -1;
+            }
+              default:
+              menu = -1;
                 break;
+            }
+          }
         }
       }
-    }
-
     else {
 
         for (int i = 0; i < 8; i++) {
