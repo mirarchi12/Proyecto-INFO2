@@ -29,12 +29,13 @@ void loop() {
 
   int PiezoVal[8] = {PiezoVal1, PiezoVal2, PiezoVal3, PiezoVal4, PiezoVal5, PiezoVal6, PiezoVal7, PiezoVal8};
 
+if(Serial.available()) {
   for(int i=0; i<8; i++) {
     Lectura[i] = PiezoVal[i];
     Serial.print(Lectura[i]);
     Serial.print("-");
-  }
+    }
   Serial.println("\n");
-  
+  }
   delay(50);
   }
