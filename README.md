@@ -2,7 +2,7 @@
 Secuenciador/Caja de ritmo para ESP-32
 
 En sensor:
-  El umbral de ruido se ecuentra en el primer if del slor sensorPiezo, asi como tambien, el control de rebote se encuentra en el ultimo if.
+  El umbral de ruido se ecuentra en el primer if del slot sensorPiezo, asi como tambien, el control de rebote se encuentra en el ultimo if.
 
 En player:
 
